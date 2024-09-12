@@ -6,7 +6,7 @@ let wasRunning = false; // Tracks if the keylogger was running in the last check
 // Log termination to the keylog.txt file
 function logToKeylogFile(message) {
   const timestamp = new Date().toLocaleString();
-  const logMessage = `${timestamp} - ${message}\n`;
+  const logMessage = `\n${timestamp} - ${message}\n`;
   fs.appendFileSync('keylog.txt', logMessage);
 }
 

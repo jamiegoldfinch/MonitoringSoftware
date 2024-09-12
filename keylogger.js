@@ -52,6 +52,8 @@ const specialKeysMap = {
     'ENTER': '\n',
     'RETURN': '\n',
     'BACKSPACE': '[BACKSPACE]',
+    'BACKSLASH': '\\',
+    'FORWARD SLASH': '/',
     'DOT': '.',
     'SEMICOLON': ';',
     'QUOTE': '\'',
@@ -98,7 +100,7 @@ const shiftKeysMap = {
     'DOT': '>',
     'QUOTE': '\"',
     'SEMICOLON': ':',
-    'SLASH': '?',
+    'FORWARD SLASH': '?',
     'BACKSLASH': '|',
     'BRACKETLEFT': '{',
     'BRACKETRIGHT': '}'
