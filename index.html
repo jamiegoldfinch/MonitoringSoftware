@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Monitoring Software Setup</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <h1>Monitoring Software Setup</h1>
+    <form id="setup-form">
+        <label for="computerName">Computer Name:</label>
+        <input type="text" id="computerName" name="computerName" required><br><br>
+        <label for="email">Accountability Partner Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <label for="reportFrequency">Report Frequency:</label>
+        <select id="reportFrequency" name="reportFrequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select><br><br>
+        <button type="submit">Save</button>
+    </form>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

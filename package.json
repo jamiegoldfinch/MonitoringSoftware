@@ -1,0 +1,18 @@
+{
+  "name": "monitoringSoftware",
+  "version": "1.0.0",
+  "description": "Monitoring software with a keylogger and watchdog",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^21.0.0",
+    "node-global-key-listener": "^0.3.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^22.14.5"
+  }
+}
