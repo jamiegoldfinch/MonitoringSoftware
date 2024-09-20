@@ -1,9 +1,7 @@
 I've got the keylogger working now. I've decided to do a date header at the start. Then just to log everything.
 
 # Keeping it running
-- So far, when I open task manager and I close one service, it successfully logs to the keylog.txt that the service has been stopped. 
-  Whether that be the keylogger or the watchdog. They both keep each other accountable.
-- Now I just need to restart both services straight away. I think the main functionality is in the main.js file.
+- So far, both services restart when I try to close them down.
 
 # Keylog strokes that need fixing
 - 

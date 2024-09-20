@@ -1,7 +1,26 @@
 
 21/09/2024
 
-21/09/2024, 6:36:44 am - Keylogger has stopped unexpectedly.
+21/09/2024, 7:04:49 am - Keylogger has stopped unexpectedly.
+
+21/09/2024, 7:04:49 am - Starting keylogger...
+
+21/09/2024, 7:04:49 am - Keylogger started
 21/09/2024
 
-21/09/2024, 6:47:52 am - Watchdog has stopped unexpectedly.
+21/09/2024, 7:05:09 am - Keylogger has stopped unexpectedly.
+
+21/09/2024, 7:05:09 am - Starting keylogger...
+
+21/09/2024, 7:05:09 am - Keylogger started
+21/09/2024
+
+21/09/2024, 7:05:24 am - Watchdog has stopped unexpectedly.
+
+
+21/09/2024, 7:05:24 am - Starting watchdog...
+
+
+21/09/2024, 7:05:25 am - Watchdog started
+sss
+21/09/2024, 7:07:09 am - Watchdog has stopped due to stop.txt.
