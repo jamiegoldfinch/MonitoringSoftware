@@ -10,7 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "electron": "^21.0.0",
-    "node-global-key-listener": "^0.3.0"
+    "node-global-key-listener": "^0.3.0",
+    "nodemailer": "^6.9.15"
   },
   "devDependencies": {
     "electron-builder": "^22.14.5"

